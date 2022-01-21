@@ -5,48 +5,77 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
-use GuzzleHttp\Psr7\Request;
+use APP\HTTP\Requests\PostRequest;
 
 class PostController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public function index()
     {
-        $posts = Post::all();
-        return response()->json($posts, 200);
+        return Post::orderByDesc('id')->get();
     }
 
-    public function create(Request $request)
+
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  PostRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(StorePostRequest $request)
     {
-        $post = new Post;
-        $post->menu = $request->menu;
-        $post->num = $request->num;
-        $post->description = $request->description;
-        $post->save();
-        return response()->json($post, 200);
+        $post = Post::create($request->all());
+
+        return $post
+            ? response()->json($post, 201)
+            : response()->json([], 500);
     }
 
-    public function edit(Request $request)
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Post $post)
     {
-        $post = Post::find($request->id);
-        return $post;
+        //
     }
 
-    public function update(Request $request)
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \PostRequest  $request
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(StorePostRequest $request, Post $post)
     {
-        $post = Post::find($request->id);
-        $post->menu = $request->menu;
-        $post->num = $request->num;
-        $post->description = $request->description;
-        $post->save();
-        $posts = Post::all();
-        return $posts;
+        $post->title = $request->title;
+        $post->category = $request->title;
+        $post->content = $request->title;
+
+        return $post->update()
+            ? response()->json($post)
+            : response()->json([], 500);
     }
 
-    public function delete(Request $request)
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Post $post)
     {
-        $post =  Post::find($request->id);
-        $post->delete();
-        $posts = Post::all();
-        return $posts;
+        return $post->delete()
+            ? response()->json($post)
+            : response()->json([], 500);
     }
 }
